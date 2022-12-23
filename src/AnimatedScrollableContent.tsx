@@ -15,7 +15,7 @@ import {memoForwardRef} from './utils/memoForwardRef';
 export const AnimatedScrollableContent = memoForwardRef(
   (props: ScrollViewProps, ref: RefObject<Animated.ScrollView>) => {
     const {width: windowWidth} = useAnimatedWindow();
-    const {animatedIndex, tabs, scrollRef} = useAnimatedScrollableView();
+    const {animatedIndex, tabs, scrollRef, onTabChange} = useAnimatedScrollableView();
 
     const onScroll = useAnimatedScrollHandler({
       onScroll: e => {
@@ -49,6 +49,20 @@ export const AnimatedScrollableContent = memoForwardRef(
         if (_width != _prevWidth) {
           runOnJS(timout)(_prevIndex, _width);
         }
+      },
+    );
+
+    const _onTabChange = useCallback(
+      (index: number) => {
+        onTabChange ? onTabChange(index) : () => {};
+      },
+      [onTabChange],
+    );
+
+    useAnimatedReaction(
+      () => staticIndex.value,
+      _index => {
+        runOnJS(_onTabChange)(_index);
       },
     );
 

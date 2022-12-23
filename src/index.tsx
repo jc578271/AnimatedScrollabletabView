@@ -14,7 +14,8 @@ interface ITab {
 interface IValue {
   animatedIndex: SharedValue<number>;
   tabs: ITab[];
-  scrollRef: React.RefObject<Animated.ScrollView>
+  scrollRef: React.RefObject<Animated.ScrollView>;
+  onTabChange?: (index: number) => void;
 }
 
 const Context = createContext<IValue | null>(null);
@@ -23,10 +24,11 @@ export const useAnimatedScrollableView = () => useContext(Context) as IValue;
 
 
 interface Props extends PropsWithChildren{
-  tabs: ITab[]
+  tabs: ITab[];
+  onTabChange?: (index: number) => void;
 }
 
-export const AnimatedScrollableProvider = ({ tabs, children }: Props) => {
+export const AnimatedScrollableProvider = ({ tabs, children, onTabChange }: Props) => {
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
 
   const animatedIndex = useSharedValue(0);
@@ -35,9 +37,10 @@ export const AnimatedScrollableProvider = ({ tabs, children }: Props) => {
     () => ({
       scrollRef,
       animatedIndex,
-      tabs
+      tabs,
+      onTabChange
     }),
-    [animatedIndex, tabs, scrollRef],
+    [animatedIndex, tabs, scrollRef, onTabChange],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
