@@ -1,4 +1,4 @@
-import {SharedValue, useSharedValue} from 'react-native-reanimated';
+import Animated, { SharedValue, useAnimatedRef, useSharedValue } from "react-native-reanimated";
 import React, {
   createContext,
   PropsWithChildren,
@@ -13,7 +13,8 @@ interface ITab {
 
 interface IValue {
   animatedIndex: SharedValue<number>;
-  tabs: ITab[]
+  tabs: ITab[];
+  scrollRef: React.RefObject<Animated.ScrollView>
 }
 
 const Context = createContext<IValue | null>(null);
@@ -26,14 +27,17 @@ interface Props extends PropsWithChildren{
 }
 
 export const AnimatedScrollableProvider = ({ tabs, children }: Props) => {
+  const scrollRef = useAnimatedRef<Animated.ScrollView>()
+
   const animatedIndex = useSharedValue(0);
 
   const value = useMemo(
     () => ({
+      scrollRef,
       animatedIndex,
       tabs
     }),
-    [animatedIndex, tabs],
+    [animatedIndex, tabs, scrollRef],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

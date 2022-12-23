@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue
+  useSharedValue, useWorkletCallback
 } from "react-native-reanimated";
 import React, { memo, useCallback } from "react";
 import { LayoutChangeEvent, TouchableOpacityProps, View } from "react-native";
@@ -27,7 +27,7 @@ export const AnimatedScrollableTabBar = memoForwardRef(() => {
 
   const {width: windowWidth} = useAnimatedWindow();
 
-  const {animatedIndex, tabs} = useAnimatedScrollableView();
+  const {animatedIndex, tabs, scrollRef} = useAnimatedScrollableView();
 
   const itemLayout = useSharedValue<{[id: string]: ILayout}>({});
 
@@ -89,6 +89,16 @@ export const AnimatedScrollableTabBar = memoForwardRef(() => {
     minWidth: windowWidth.value,
   }));
 
+  const onTabPress = useWorkletCallback(
+    (index: number) => () => {
+      scrollRef.current?.scrollTo({
+        x: index * windowWidth.value,
+        animated: true,
+      });
+    },
+    [scrollRef.current],
+  );
+
   return (
     <View>
       <Animated.ScrollView
@@ -104,6 +114,7 @@ export const AnimatedScrollableTabBar = memoForwardRef(() => {
               index={index}
               animatedIndex={animatedIndex}
               itemLayout={itemLayout}
+              onPress={onTabPress(index)}
             />
           ))}
         </Animated.View>

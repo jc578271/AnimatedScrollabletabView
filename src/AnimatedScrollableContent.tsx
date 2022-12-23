@@ -3,7 +3,6 @@ import Animated, {
   runOnJS,
   SharedValue,
   useAnimatedReaction,
-  useAnimatedRef,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useDerivedValue,
@@ -15,9 +14,8 @@ import {memoForwardRef} from './utils/memoForwardRef';
 
 export const AnimatedScrollableContent = memoForwardRef(
   (props: ScrollViewProps, ref: RefObject<Animated.ScrollView>) => {
-    const _ref = useAnimatedRef<Animated.ScrollView>();
     const {width: windowWidth} = useAnimatedWindow();
-    const {animatedIndex, tabs} = useAnimatedScrollableView();
+    const {animatedIndex, tabs, scrollRef} = useAnimatedScrollableView();
 
     const onScroll = useAnimatedScrollHandler({
       onScroll: e => {
@@ -33,10 +31,10 @@ export const AnimatedScrollableContent = memoForwardRef(
     const timout = useCallback(
       (_prevIndex: number, _width: number) => {
         setTimeout(() => {
-          _ref.current?.scrollTo({x: _prevIndex * _width, animated: true});
+          scrollRef.current?.scrollTo({x: _prevIndex * _width, animated: true});
         }, 50);
       },
-      [_ref],
+      [scrollRef],
     );
 
     /**
@@ -56,7 +54,7 @@ export const AnimatedScrollableContent = memoForwardRef(
 
     return (
       <Animated.ScrollView
-        ref={_ref}
+        ref={scrollRef}
         horizontal={true}
         onScroll={onScroll}
         scrollEventThrottle={16}
